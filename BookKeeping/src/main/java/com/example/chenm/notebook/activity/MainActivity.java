@@ -123,6 +123,9 @@ public class MainActivity extends Activity implements OnItemSwipeListener {
         recordList.setAdapter(adapter);
     }
 
+
+
+
     @OnClick({R.id.users, R.id.btn_settlement, R.id.btn_new_record, R.id.please_choose_time, R.id.tv_available_amount})
     public void onViewClicked(View view) {
         switch (view.getId()) {
