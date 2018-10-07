@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<litepal>
+    <dbname value="notebook"/>
+    <version value="8"/>
+    <list>
+        <mapping class="com.example.chenm.notebook.model.Record"/>
+        <mapping class="com.example.chenm.notebook.model.User"/>
+        <mapping class="com.example.chenm.notebook.model.WithPeople"/>
+    </list>
+    <storage value="notebook/database"/>
+</litepal>

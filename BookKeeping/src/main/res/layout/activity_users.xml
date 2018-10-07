@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/main_gray"
+    tools:context=".activity.UsersActivity">
+
+    <include
+        android:id="@+id/title_bar_layout"
+        layout="@layout/layout_title_bar"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/user_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <RelativeLayout
+        android:id="@+id/add_relation_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/add_relation_icon_big"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@mipmap/add_relation"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"/>
+
+        <TextView
+            android:id="@+id/add_relation_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_relation"
+            android:layout_below="@+id/add_relation_icon_big"
+            android:textColor="@color/order_name_blue"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"/>
+
+        <TextView
+            android:id="@+id/add_relation_btn"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/white_10dp_corner"
+            android:layout_below="@+id/add_relation_hint"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginTop="40dp"
+            android:textColor="@color/text_color_6"
+            android:text="+"
+            android:gravity="center"/>
+    </RelativeLayout>
+
+</LinearLayout>

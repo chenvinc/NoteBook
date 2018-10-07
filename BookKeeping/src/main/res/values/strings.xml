@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">BookKeeping</string>
+    <string name="insert_new_record">新增记录</string>
+    <string name="cancel">取消</string>
+    <string name="sure">确定</string>
+    <string name="insert_new_record_2">新增</string>
+    <string name="settlement">结算</string>
+    <string name="select_time">选择筛选时间</string>
+    <string name="have_no_record_yet">暂无账单记录</string>
+    <string name="have_no_unsettlement_record_yet">暂无未结算账单记录</string>
+    <string name="please_input">请输入</string>
+    <string name="add_success">添加成功</string>
+    <string name="relations">关系人</string>
+    <string name="add_relation">添加关系人</string>
+</resources>
