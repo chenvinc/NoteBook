@@ -72,11 +72,21 @@ public class SelectUserAdapter extends RecyclerView.Adapter<SelectUserAdapter.Se
             super(itemView);
             checkBox = itemView.findViewById(R.id.item_choose);
             nameText = itemView.findViewById(R.id.select_user_name);
+            itemView.setOnClickListener(this);
             checkBox.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
+            if (R.id.item_choose == v.getId()){
+                onClickAction();
+            } else {
+                checkBox.setChecked(!checkBox.isChecked());
+                onClickAction();
+            }
+        }
+
+        public void onClickAction() {
             if (!canChooseAll){
                 for (int i =0;i<mSelectUsers.size();i++){
                     mSelectUsers.get(i).setCheck(false);

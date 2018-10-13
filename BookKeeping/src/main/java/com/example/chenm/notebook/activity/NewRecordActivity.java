@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,45 +17,51 @@ import com.bigkoo.pickerview.view.TimePickerView;
 import com.blankj.utilcode.util.ObjectUtils;
 import com.example.chenm.notebook.R;
 import com.example.chenm.notebook.model.RecordsForShow;
+import com.example.chenm.notebook.model.SelectUser;
+import com.example.chenm.notebook.model.User;
 import com.example.chenm.notebook.utils.CommonUtils;
 import com.example.chenm.notebook.utils.DataBaseUtils;
 import com.example.chenm.notebook.utils.DialogDef;
-import com.example.chenm.notebook.model.Record;
-import com.example.chenm.notebook.model.SelectUser;
-import com.example.chenm.notebook.model.User;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
+
 /**
  * @author chenm
  */
 
-public class NewRecordActivity extends Activity implements View.OnClickListener{
+public class NewRecordActivity extends Activity {
 
-    /**
-     * 导航条
-     */
-    public RelativeLayout relBar;
     /**
      * 返回
      */
-    public ImageView ivBack;
+    @BindView(R.id.iv_back)
+    ImageView ivBack;
     /**
      * 标题
      */
-    public TextView tvTitle;
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
 
-    private TextView recordDate;
-    private EditText recordThings;
-    private EditText recordPaymentAmount;
-    private TextView recordPaymentPeople;
-    private TextView recordWithPeople;
-    private TextView commitBtn;
+    @BindView(R.id.time_date)
+    TextView recordDate;
+    @BindView(R.id.things_name)
+    EditText recordThings;
+    @BindView(R.id.payment_price)
+    EditText recordPaymentAmount;
+    @BindView(R.id.payment_people)
+    TextView recordPaymentPeople;
+    @BindView(R.id.with_people)
+    TextView recordWithPeople;
 
-    private RelativeLayout successLayout;
+    Unbinder unbinder;
 
     private TimePickerView pvCustomTime;
     private String chooseTime = "";
@@ -65,22 +70,15 @@ public class NewRecordActivity extends Activity implements View.OnClickListener{
     private SelectUser paymentPeople;
     private List<SelectUser> withPeoples = new ArrayList<>();
 
-    public static void launch(Context context){
-        context.startActivity(new Intent(context,NewRecordActivity.class));
+    public static void launch(Context context) {
+        context.startActivity(new Intent(context, NewRecordActivity.class));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_record);
-        initActionBarView();
-        initView();
-    }
-
-    private void initActionBarView(){
-        relBar = findViewById(R.id.rel_bar);
-        ivBack = findViewById(R.id.iv_back);
-        tvTitle = findViewById(R.id.tv_title);
+        unbinder = ButterKnife.bind(this);
         tvTitle.setText("新增记录");
         ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,44 +86,38 @@ public class NewRecordActivity extends Activity implements View.OnClickListener{
                 finish();
             }
         });
+        init();
     }
 
-    private void initView(){
-        recordDate = findViewById(R.id.time_date);
-        recordThings = findViewById(R.id.things_name);
-        recordPaymentAmount = findViewById(R.id.payment_price);
-        recordPaymentPeople = findViewById(R.id.payment_people);
-        recordWithPeople = findViewById(R.id.with_people);
-        commitBtn = findViewById(R.id.commit_btn);
-        successLayout = findViewById(R.id.insert_new_record_success);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
+    }
 
-        for (User user : DataBaseUtils.selectAllUser()){
+    private void init() {
+        for (User user : DataBaseUtils.selectAllUser()) {
             SelectUser selectUser = new SelectUser();
             selectUser.setCheck(false);
             selectUser.setUser(user);
             selectUsers.add(selectUser);
         }
-
-        recordPaymentPeople.setOnClickListener(this);
-        recordWithPeople.setOnClickListener(this);
-        recordDate.setOnClickListener(this);
-        commitBtn.setOnClickListener(this);
     }
 
-    @Override
+    @OnClick({R.id.time_date, R.id.commit_btn, R.id.with_people, R.id.payment_people})
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.time_date:
                 initTimePicker();
                 pvCustomTime.show();
                 break;
             case R.id.payment_people:
-                DialogDef dialogChoosePaymentPeople = new DialogDef(this,selectUsers,false);
+                DialogDef dialogChoosePaymentPeople = new DialogDef(this, selectUsers, false);
                 dialogChoosePaymentPeople.setConfirmButtonOnclickListener(new DialogDef.OnConfirmButtonOnclickListener() {
                     @Override
                     public void onConfirmButtonClick(List<SelectUser> list) {
-                        for (SelectUser user :list){
-                            if (user.getCheck()){
+                        for (SelectUser user : list) {
+                            if (user.getCheck()) {
                                 paymentPeople = user;
                                 recordPaymentPeople.setText(user.getUser().getUserName());
                             }
@@ -135,15 +127,16 @@ public class NewRecordActivity extends Activity implements View.OnClickListener{
                 dialogChoosePaymentPeople.show();
                 break;
             case R.id.with_people:
-                DialogDef dialogChooseWithPeoples = new DialogDef(this,selectUsers);
+                DialogDef dialogChooseWithPeoples = new DialogDef(this, selectUsers);
                 dialogChooseWithPeoples.setConfirmButtonOnclickListener(new DialogDef.OnConfirmButtonOnclickListener() {
                     @Override
                     public void onConfirmButtonClick(List<SelectUser> list) {
                         StringBuffer withPeopleName = new StringBuffer();
-                        for (SelectUser user : list){
-                            if (user.getCheck()){
+                        withPeoples.clear();
+                        for (SelectUser user : list) {
+                            if (user.getCheck()) {
                                 withPeoples.add(user);
-                                withPeopleName.append(user.getUser().getUserName()+"; ");
+                                withPeopleName.append(user.getUser().getUserName() + "; ");
                             }
                         }
                         recordWithPeople.setText(withPeopleName);
@@ -158,30 +151,31 @@ public class NewRecordActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    private void commit(){
+    private void commit() {
         RecordsForShow record = new RecordsForShow();
-        if (recordDate.getText() == null){
-            Toast.makeText(this,"未输入日期",Toast.LENGTH_SHORT).show();
+        if (recordDate.getText() == null) {
+            Toast.makeText(this, "未输入日期", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (recordThings.getText() == null){
-            Toast.makeText(this,"未输入明细",Toast.LENGTH_SHORT).show();
+        if (recordThings.getText() == null) {
+            Toast.makeText(this, "未输入明细", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (ObjectUtils.isEmpty(paymentPeople)){
-            Toast.makeText(this,"未输入付款人",Toast.LENGTH_SHORT).show();
+        if (ObjectUtils.isEmpty(paymentPeople)) {
+            Toast.makeText(this, "未输入付款人", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (withPeoples.size() == 0){
-            Toast.makeText(this,"未选择关系人",Toast.LENGTH_SHORT).show();
+        if (withPeoples.size() == 0) {
+            Toast.makeText(this, "未选择关系人", Toast.LENGTH_SHORT).show();
             return;
-        }if (recordPaymentAmount.getText() == null){
-            Toast.makeText(this,"未输入金额",Toast.LENGTH_SHORT).show();
+        }
+        if (recordPaymentAmount.getText() == null) {
+            Toast.makeText(this, "未输入金额", Toast.LENGTH_SHORT).show();
             return;
         }
 
         List<User> withPeopleList = new ArrayList<>();
-        for (SelectUser selectUser : withPeoples){
+        for (SelectUser selectUser : withPeoples) {
             withPeopleList.add(selectUser.getUser());
         }
         record.setUsers(withPeopleList);
@@ -190,14 +184,14 @@ public class NewRecordActivity extends Activity implements View.OnClickListener{
         record.setThing(recordThings.getText().toString());
         record.setPrice(Double.parseDouble(recordPaymentAmount.getText().toString()));
         record.setIsCheck("0");
-        if (DataBaseUtils.saveRecord(record)){
+        if (DataBaseUtils.saveRecord(record)) {
             finish();
-        }else {
-            Toast.makeText(this,"保存失败",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void initTimePicker(){
+    private void initTimePicker() {
         //系统当前时间
         Calendar selectedDate = Calendar.getInstance();
         Calendar startDate = Calendar.getInstance();
@@ -240,7 +234,7 @@ public class NewRecordActivity extends Activity implements View.OnClickListener{
                                 pvCustomTime.returnData();
                                 pvCustomTime.dismiss();
                                 recordDate.setText(chooseTime);
-                                }
+                            }
                         });
                         noSure.setOnClickListener(new View.OnClickListener() {
                             @Override

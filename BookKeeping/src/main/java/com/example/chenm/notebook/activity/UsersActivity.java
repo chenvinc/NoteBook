@@ -26,6 +26,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
 /**
  * @author chenm
@@ -45,6 +46,8 @@ public class UsersActivity extends Activity{
     @BindView(R.id.add_relation_layout)
     RelativeLayout addRelationLayout;
 
+    Unbinder unbinder;
+
     private List<User> users = new ArrayList<>();
     private UserListAdapter adapter;
     private DialogWithEditText dialogWithEditText;
@@ -57,11 +60,11 @@ public class UsersActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
-        ButterKnife.bind(this);
+        unbinder = ButterKnife.bind(this);
         tvTitle.setText(R.string.relations);
         ivRight.setVisibility(View.VISIBLE);
         users.addAll(DataBaseUtils.selectAllUser());
-        adapter = new UserListAdapter(this,users);
+        adapter = new UserListAdapter(users);
     }
 
     @Override
@@ -73,6 +76,12 @@ public class UsersActivity extends Activity{
             userList.setLayoutManager(new LinearLayoutManager(this));
             userList.setAdapter(adapter);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
     }
 
     @OnClick({R.id.iv_right, R.id.add_relation_btn, R.id.iv_back})
@@ -103,7 +112,7 @@ public class UsersActivity extends Activity{
                     dialogWithEditText.dismiss();
                     users.clear();
                     users.addAll(DataBaseUtils.selectAllUser());
-                    adapter.setData(users);
+                    adapter.setNewData(users);
                 }else {
                     Toast.makeText(UsersActivity.this,"添加失败",Toast.LENGTH_SHORT).show();
                 }

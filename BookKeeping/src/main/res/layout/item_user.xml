@@ -8,7 +8,7 @@
         android:layout_marginHorizontal="15dp"
         android:layout_marginVertical="8dp"
         app:cardCornerRadius="10dp"
-        app:cardElevation="5dp"
+        app:cardElevation="0dp"
         android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -22,11 +22,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
+                    android:textColor="@color/text_blue"
                     android:textSize="18sp"
                     android:text="Id:"
                     android:layout_width="70dp"
                     android:layout_height="wrap_content" />
                 <TextView
+                    android:textColor="@color/text_blue"
                     android:id="@+id/user_id"
                     android:layout_marginLeft="40dp"
                     android:textSize="18sp"
@@ -39,11 +41,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
+                    android:textColor="@color/black"
                     android:textSize="18sp"
                     android:text="Name:"
                     android:layout_width="70dp"
                     android:layout_height="wrap_content" />
                 <TextView
+                    android:textColor="@color/black"
                     android:id="@+id/user_name"
                     android:layout_marginLeft="40dp"
                     android:textSize="18sp"

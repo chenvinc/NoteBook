@@ -152,6 +152,8 @@ public class SettlementActivity extends Activity {
         SPUtils.getInstance().put("settlement_time",records.get(records.size()-1).getTime());
         SPUtils.getInstance().put("settlement_price"," "+settlement.allAmount);
 
+        settlement.allAmount = new BigDecimal(settlement.allAmount).setScale(2,BigDecimal.ROUND_HALF_DOWN).doubleValue();
+
         double price;
         for (int i=0;i<settlement.dataPayment.size();i++){
             settlement.dataSettlementAll.get(i).price = settlement.dataShouldPay.get(i).price - settlement.dataPayment.get(i).price;
