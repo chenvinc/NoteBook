@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <litepal>
-    <dbname value="notebook"/>
-    <version value="8"/>
+    <dbname value="bookkeeping"/>
+    <version value="9"/>
     <list>
         <mapping class="com.example.chenm.notebook.model.Record"/>
         <mapping class="com.example.chenm.notebook.model.User"/>

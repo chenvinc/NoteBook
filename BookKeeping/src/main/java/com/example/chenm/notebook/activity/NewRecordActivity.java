@@ -96,7 +96,7 @@ public class NewRecordActivity extends Activity {
     }
 
     private void init() {
-        for (User user : DataBaseUtils.selectAllUser()) {
+        for (User user : DataBaseUtils.getInstance().selectAllUser()) {
             SelectUser selectUser = new SelectUser();
             selectUser.setCheck(false);
             selectUser.setUser(user);
@@ -184,7 +184,7 @@ public class NewRecordActivity extends Activity {
         record.setThing(recordThings.getText().toString());
         record.setPrice(Double.parseDouble(recordPaymentAmount.getText().toString()));
         record.setIsCheck("0");
-        if (DataBaseUtils.saveRecord(record)) {
+        if (DataBaseUtils.getInstance().saveRecord(record)) {
             finish();
         } else {
             Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
@@ -193,7 +193,7 @@ public class NewRecordActivity extends Activity {
 
     private void initTimePicker() {
         //系统当前时间
-        Calendar selectedDate = Calendar.getInstance();
+        final Calendar selectedDate = Calendar.getInstance();
         Calendar startDate = Calendar.getInstance();
         Calendar endDate = Calendar.getInstance();
 
@@ -215,7 +215,7 @@ public class NewRecordActivity extends Activity {
             //选中事件回调
             @Override
             public void onTimeSelect(Date date, View v) {
-                chooseTime = CommonUtils.getDate3(date.getTime());
+                chooseTime = CommonUtils.getDate(date.getTime());
             }
         })
                 .setDate(selectedDate)

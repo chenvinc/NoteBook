@@ -2,6 +2,7 @@ package com.example.chenm.notebook.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author chenhongyu
@@ -14,40 +15,28 @@ public class CommonUtils {
 
     public static String getYear() {
         Date currentTime = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy",Locale.getDefault());
         String dateString = formatter.format(currentTime);
         return dateString;
     }
 
     public static String getMouth() {
         Date currentTime = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("MM");
+        SimpleDateFormat formatter = new SimpleDateFormat("MM",Locale.getDefault());
         String dateString = formatter.format(currentTime);
         return dateString;
     }
 
     public static String getDay() {
         Date currentTime = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd",Locale.getDefault());
         String dateString = formatter.format(currentTime);
         return dateString;
     }
 
     public static String getDate(long date) {
         Date currentTime = new Date(date);
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日");
-        return formatter.format(currentTime);
-    }
-
-    public static String getDate2(long date) {
-        Date currentTime = new Date(date);
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        return formatter.format(currentTime);
-    }
-
-    public static String getDate3(long date) {
-        Date currentTime = new Date(date);
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd",Locale.getDefault());
         return formatter.format(currentTime);
     }
 }

@@ -1,16 +1,11 @@
 package com.example.chenm.notebook.utils;
 
-
-import android.util.Log;
-
 import com.example.chenm.notebook.model.Record;
 import com.example.chenm.notebook.model.RecordsForShow;
 import com.example.chenm.notebook.model.User;
 import com.example.chenm.notebook.model.WithPeople;
-import com.google.gson.Gson;
 
 import org.litepal.LitePal;
-import org.litepal.crud.LitePalSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +19,24 @@ import java.util.List;
  */
 public class DataBaseUtils {
 
-    public static List<User> selectAllUser(){
+    private static DataBaseUtils dataBaseUtils;
+
+    public static DataBaseUtils getInstance() {
+        if (dataBaseUtils == null) {
+            synchronized (DataBaseUtils.class){
+                if (dataBaseUtils == null) {
+                    dataBaseUtils = new DataBaseUtils();
+                }
+            }
+        }
+        return dataBaseUtils;
+    }
+
+    public List<User> selectAllUser(){
         return LitePal.findAll(User.class);
     }
 
-    public static List<RecordsForShow> selectAllRecord(){
+    public List<RecordsForShow> select10Records(){
         List<RecordsForShow> records = new ArrayList<>();
         List<Record> recordList = LitePal.order("id desc").find(Record.class,true);
         for (Record record :recordList){
@@ -45,28 +53,11 @@ public class DataBaseUtils {
         return records;
     }
 
-    public static List<RecordsForShow> selectLimitTimeRecord(String startTime, String endTime){
-        List<RecordsForShow> records = new ArrayList<>();
-        List<Record> recordList = LitePal.where("time > ? and time < ?",startTime,endTime).order("id desc").find(Record.class,true);
-        for (Record record :recordList){
-            RecordsForShow recordsForShow =  new RecordsForShow();
-            recordsForShow.setId(record.getId());
-            recordsForShow.setBuyer(selectUserById(record.getBuyerId()));
-            recordsForShow.setIsCheck(record.getIsCheck());
-            recordsForShow.setPrice(record.getPrice());
-            recordsForShow.setThing(record.getThing());
-            recordsForShow.setTime(record.getTime());
-            recordsForShow.setUsers(selectUsersByIds(record.getWithPeopleList()));
-            records.add(recordsForShow);
-        }
-        return records;
-    }
-
-    public static User selectUserById(int id){
+    private User selectUserById(int id){
         return LitePal.find(User.class,id);
     }
 
-    public static List<User> selectUsersByIds(List<WithPeople> withPeoples){
+    private List<User> selectUsersByIds(List<WithPeople> withPeoples){
         List<User> users = new ArrayList<>();
         for (WithPeople withPeople : withPeoples){
             users.add(selectUserById(withPeople.getWithPeopleId()));
@@ -74,7 +65,7 @@ public class DataBaseUtils {
         return users;
     }
 
-    public static List<RecordsForShow> selectAllUnsettlementRecord(){
+    public List<RecordsForShow> selectAllUnsettlementRecord(){
         String unCheck = "0";
         List<RecordsForShow> records = new ArrayList<>();
         List<Record> recordList = LitePal.where("isCheck = ?",unCheck).find(Record.class,true);
@@ -92,7 +83,7 @@ public class DataBaseUtils {
         return records;
     }
 
-    public static boolean saveRecord(RecordsForShow recordsForShow){
+    public boolean saveRecord(RecordsForShow recordsForShow){
         Record record = new Record();
         for (User user : recordsForShow.getUsers()){
             WithPeople people = new WithPeople();
@@ -108,7 +99,7 @@ public class DataBaseUtils {
         return record.save();
     }
 
-    public static void deleteRecord(int recordId){
+    public void deleteRecord(int recordId){
         LitePal.delete(Record.class,recordId);
     }
 }

@@ -61,7 +61,7 @@
                         android:layout_height="wrap_content"
                         android:text="￥"
                         android:textColor="@color/order_name"
-                        android:textSize="15dp" />
+                        android:textSize="15sp" />
 
                     <TextView
                         android:singleLine="true"
@@ -72,12 +72,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0.00"
-                        android:textSize="35dp" />
+                        android:textSize="35sp" />
                 </LinearLayout>
                 <TextView
                     android:text="2018-09-23"
                     android:textSize="20sp"
-                    android:gravity="right|bottom"
+                    android:gravity="end|bottom"
                     android:id="@+id/settlement_date"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
@@ -88,6 +88,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_margin="5dp"
+                android:baselineAligned="false"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -104,7 +105,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settlement"
-                        android:textColor="@color/white"></TextView>
+                        android:textColor="@color/white"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -121,39 +122,20 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/insert_new_record_2"
-                        android:textColor="@color/white"></TextView>
+                        android:textColor="@color/white"/>
                 </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="13dp"
-        android:paddingVertical="10dp"
-        android:orientation="horizontal">
-        <LinearLayout
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/please_choose_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_time"
-                android:textSize="14dp" />
-            <ImageView
-                android:layout_marginLeft="3.5dp"
-                android:src="@mipmap/account_invertedtriangle"
-                android:layout_width="6dp"
-                android:layout_height="3.5dp" />
-        </LinearLayout>
-
-    </LinearLayout>
+        android:text="@string/record_data"
+        android:textSize="15sp" />
 
     <LinearLayout
         android:visibility="gone"

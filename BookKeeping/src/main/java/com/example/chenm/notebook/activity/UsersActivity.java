@@ -50,7 +50,6 @@ public class UsersActivity extends Activity{
 
     private List<User> users = new ArrayList<>();
     private UserListAdapter adapter;
-    private DialogWithEditText dialogWithEditText;
 
     public static void launch(Context context) {
         context.startActivity(new Intent(context, UsersActivity.class));
@@ -63,16 +62,17 @@ public class UsersActivity extends Activity{
         unbinder = ButterKnife.bind(this);
         tvTitle.setText(R.string.relations);
         ivRight.setVisibility(View.VISIBLE);
-        users.addAll(DataBaseUtils.selectAllUser());
-        adapter = new UserListAdapter(users);
+        adapter = new UserListAdapter();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        users.addAll(DataBaseUtils.getInstance().selectAllUser());
         if (ObjectUtils.isEmpty(users)){
             addRelationLayout.setVisibility(View.VISIBLE);
         }else {
+            adapter.setNewData(users);
             userList.setLayoutManager(new LinearLayoutManager(this));
             userList.setAdapter(adapter);
         }
@@ -100,9 +100,8 @@ public class UsersActivity extends Activity{
     }
 
     private void showAddUserDialog(){
-        if (dialogWithEditText == null){
-            dialogWithEditText = new DialogWithEditText(this);
-        }
+        final DialogWithEditText dialogWithEditText = new DialogWithEditText(this);
+
         dialogWithEditText.setConfirmButtonOnclickListener(new DialogWithEditText.OnConfirmButtonOnclickListener() {
             @Override
             public void onConfirmButtonClick(String username) {
@@ -111,7 +110,8 @@ public class UsersActivity extends Activity{
                 if (user.save()){
                     dialogWithEditText.dismiss();
                     users.clear();
-                    users.addAll(DataBaseUtils.selectAllUser());
+                    users.addAll(DataBaseUtils.getInstance().selectAllUser());
+                    addRelationLayout.setVisibility(View.GONE);
                     adapter.setNewData(users);
                 }else {
                     Toast.makeText(UsersActivity.this,"添加失败",Toast.LENGTH_SHORT).show();

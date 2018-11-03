@@ -115,7 +115,7 @@ public class SettlementActivity extends Activity {
 
     public void settlementAllRecord(){
 
-        List<User> users = DataBaseUtils.selectAllUser();
+        List<User> users = DataBaseUtils.getInstance().selectAllUser();
         for (User user : users) {
             SettlementItem data1 = new SettlementItem();
             data1.price = 0;
@@ -131,7 +131,7 @@ public class SettlementActivity extends Activity {
             settlement.dataSettlementAll.add(data3);
         }
 
-        List<RecordsForShow> records = DataBaseUtils.selectAllUnsettlementRecord();
+        List<RecordsForShow> records = DataBaseUtils.getInstance().selectAllUnsettlementRecord();
         if (records == null || records.size() == 0){
             noRecordsLayout.setVisibility(View.VISIBLE);
             settlementContent.setVisibility(View.GONE);
