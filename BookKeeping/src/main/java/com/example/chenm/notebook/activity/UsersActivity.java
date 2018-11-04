@@ -3,10 +3,12 @@ package com.example.chenm.notebook.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -14,11 +16,21 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ObjectUtils;
 import com.example.chenm.notebook.R;
+import com.example.chenm.notebook.utils.CommonUtils;
 import com.example.chenm.notebook.utils.DataBaseUtils;
 import com.example.chenm.notebook.adapter.UserListAdapter;
 import com.example.chenm.notebook.model.User;
 import com.example.chenm.notebook.utils.DialogDef;
 import com.example.chenm.notebook.utils.DialogWithEditText;
+import com.yanzhenjie.recyclerview.swipe.SwipeMenu;
+import com.yanzhenjie.recyclerview.swipe.SwipeMenuBridge;
+import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;
+import com.yanzhenjie.recyclerview.swipe.SwipeMenuItem;
+import com.yanzhenjie.recyclerview.swipe.SwipeMenuItemClickListener;
+import com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView;
+import com.yanzhenjie.recyclerview.swipe.widget.DefaultItemDecoration;
+
+import org.litepal.LitePal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +52,7 @@ public class UsersActivity extends Activity{
     @BindView(R.id.iv_right)
     ImageView ivRight;
     @BindView(R.id.user_list)
-    RecyclerView userList;
+    SwipeMenuRecyclerView userList;
     @BindView(R.id.add_relation_btn)
     TextView addRelationBtn;
     @BindView(R.id.add_relation_layout)
@@ -63,6 +75,32 @@ public class UsersActivity extends Activity{
         tvTitle.setText(R.string.relations);
         ivRight.setVisibility(View.VISIBLE);
         adapter = new UserListAdapter();
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+            @Override
+            public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int viewType) {
+                SwipeMenuItem deleteItem = new SwipeMenuItem(UsersActivity.this);
+                deleteItem.setBackground(R.color.red1)
+                        .setWidth(170)
+                        .setHeight(ViewGroup.LayoutParams.MATCH_PARENT)
+                        .setText("删除")
+                        .setTextColor(Color.WHITE);
+                swipeRightMenu.addMenuItem(deleteItem);
+            }
+        };
+        userList.setSwipeMenuCreator(creator);
+        userList.setSwipeMenuItemClickListener(new SwipeMenuItemClickListener() {
+            @Override
+            public void onItemClick(SwipeMenuBridge menuBridge) {
+                menuBridge.closeMenu();
+                User user = adapter.getData().get(menuBridge.getAdapterPosition());
+                LitePal.delete(User.class,user.getId());
+                refreshUserList();
+            }
+        });
+        DefaultItemDecoration decoration = new DefaultItemDecoration(getResources().getColor(R.color.text_gray1));
+        userList.addItemDecoration(decoration);
+        userList.setLayoutManager(new LinearLayoutManager(this));
+        userList.setAdapter(adapter);
     }
 
     @Override
@@ -73,8 +111,6 @@ public class UsersActivity extends Activity{
             addRelationLayout.setVisibility(View.VISIBLE);
         }else {
             adapter.setNewData(users);
-            userList.setLayoutManager(new LinearLayoutManager(this));
-            userList.setAdapter(adapter);
         }
     }
 
@@ -99,9 +135,19 @@ public class UsersActivity extends Activity{
         }
     }
 
+    private void refreshUserList() {
+        users.clear();
+        users.addAll(DataBaseUtils.getInstance().selectAllUser());
+        if (users.size() == 0) {
+            addRelationLayout.setVisibility(View.VISIBLE);
+        } else {
+            addRelationLayout.setVisibility(View.GONE);
+        }
+        adapter.setNewData(users);
+    }
+
     private void showAddUserDialog(){
         final DialogWithEditText dialogWithEditText = new DialogWithEditText(this);
-
         dialogWithEditText.setConfirmButtonOnclickListener(new DialogWithEditText.OnConfirmButtonOnclickListener() {
             @Override
             public void onConfirmButtonClick(String username) {
@@ -109,10 +155,7 @@ public class UsersActivity extends Activity{
                 user.setUserName(username);
                 if (user.save()){
                     dialogWithEditText.dismiss();
-                    users.clear();
-                    users.addAll(DataBaseUtils.getInstance().selectAllUser());
-                    addRelationLayout.setVisibility(View.GONE);
-                    adapter.setNewData(users);
+                    refreshUserList();
                 }else {
                     Toast.makeText(UsersActivity.this,"添加失败",Toast.LENGTH_SHORT).show();
                 }

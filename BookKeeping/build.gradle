@@ -6,8 +6,8 @@ android {
         applicationId "com.example.chenm.notebook"
         minSdkVersion 25
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 11
+        versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -19,6 +19,8 @@ android {
 }
 
 dependencies {
+
+    implementation 'com.yanzhenjie:recyclerview-swipe:1.1.4'
 
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'
     api 'com.jakewharton:butterknife:8.8.1'

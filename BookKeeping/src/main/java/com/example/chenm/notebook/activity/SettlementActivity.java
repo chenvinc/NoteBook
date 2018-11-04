@@ -64,11 +64,17 @@ public class SettlementActivity extends Activity {
     @BindView(R.id.settlement_all)
     RecyclerView settlementAll;
 
-    //应付金额
+    /**
+     * 应付金额
+     */
     private MyAdapter mShouldPayAdapter;
-    //已付金额
+    /**
+     * 已付金额
+     */
     private MyAdapter mPaymentAdapter;
-    //结算金额
+    /**
+     * 结算金额
+     */
     private MyAdapter mSettlementAllAdapter;
 
     private Settlement settlement = new Settlement();

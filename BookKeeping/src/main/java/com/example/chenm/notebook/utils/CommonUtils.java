@@ -9,7 +9,7 @@ import java.util.Locale;
  * @Date 2018/9/8
  * @Time 16:10
  * @Version 1.0
- * @Description ${DESCRIPTION}
+ * @Description 公用工具类
  */
 public class CommonUtils {
 

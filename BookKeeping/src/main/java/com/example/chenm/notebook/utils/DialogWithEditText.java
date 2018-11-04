@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -27,7 +28,7 @@ public class DialogWithEditText extends Dialog {
 
     private Context context;
     private static final int resId = R.layout.view_edit_dialog;
-
+    private InputMethodManager imm;
     /**
      * 确定按钮被点击了的监听器
      */
@@ -52,6 +53,8 @@ public class DialogWithEditText extends Dialog {
     public DialogWithEditText(final Context context) {
         super(context, R.style.AlertDialog);
         this.context = context;
+        imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+
     }
 
     @Override
@@ -73,6 +76,23 @@ public class DialogWithEditText extends Dialog {
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void show() {
+        super.show();
+        if (imm != null) {
+            etUserNameFill.requestFocus();
+            imm.showSoftInput(etUserNameFill, InputMethodManager.SHOW_FORCED);
+        }
+    }
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(etUserNameFill.getWindowToken(), 0);
         }
     }
 }
