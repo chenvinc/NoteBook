@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ObjectUtils;
+import com.blankj.utilcode.util.SPUtils;
 import com.example.chenm.notebook.R;
 import com.example.chenm.notebook.utils.CommonUtils;
 import com.example.chenm.notebook.utils.DataBaseUtils;
@@ -22,6 +23,7 @@ import com.example.chenm.notebook.adapter.UserListAdapter;
 import com.example.chenm.notebook.model.User;
 import com.example.chenm.notebook.utils.DialogDef;
 import com.example.chenm.notebook.utils.DialogWithEditText;
+import com.example.chenm.notebook.utils.RemindDialog;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenu;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuBridge;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;
@@ -63,6 +65,10 @@ public class UsersActivity extends Activity{
     private List<User> users = new ArrayList<>();
     private UserListAdapter adapter;
 
+    private RemindDialog remindDialog;
+
+    boolean isFirstDelete;
+
     public static void launch(Context context) {
         context.startActivity(new Intent(context, UsersActivity.class));
     }
@@ -75,6 +81,7 @@ public class UsersActivity extends Activity{
         tvTitle.setText(R.string.relations);
         ivRight.setVisibility(View.VISIBLE);
         adapter = new UserListAdapter();
+        isFirstDelete = SPUtils.getInstance().getBoolean("is_first_delete");
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
             public void onCreateMenu(SwipeMenu swipeLeftMenu, SwipeMenu swipeRightMenu, int viewType) {
@@ -93,8 +100,13 @@ public class UsersActivity extends Activity{
             public void onItemClick(SwipeMenuBridge menuBridge) {
                 menuBridge.closeMenu();
                 User user = adapter.getData().get(menuBridge.getAdapterPosition());
-                LitePal.delete(User.class,user.getId());
-                refreshUserList();
+                if (!isFirstDelete) {
+                    initRemindDialog(user);
+                    remindDialog.show();
+                } else {
+                    LitePal.delete(User.class,user.getId());
+                    refreshUserList();
+                }
             }
         });
         DefaultItemDecoration decoration = new DefaultItemDecoration(getResources().getColor(R.color.text_gray1));
@@ -106,6 +118,7 @@ public class UsersActivity extends Activity{
     @Override
     protected void onResume() {
         super.onResume();
+        users.clear();
         users.addAll(DataBaseUtils.getInstance().selectAllUser());
         if (ObjectUtils.isEmpty(users)){
             addRelationLayout.setVisibility(View.VISIBLE);
@@ -133,6 +146,26 @@ public class UsersActivity extends Activity{
             default:
                 break;
         }
+    }
+
+    private void initRemindDialog(final User user) {
+        remindDialog = new RemindDialog(this);
+        remindDialog.setCancelButtonOnclickListener(new RemindDialog.OnCancelButtonOnclickListener() {
+            @Override
+            public void onCancelButtonClick() {
+                remindDialog.dismiss();
+            }
+        });
+        remindDialog.setConfirmButtonOnclickListener(new RemindDialog.OnConfirmButtonOnclickListener() {
+            @Override
+            public void onConfirmButtonClick() {
+                remindDialog.dismiss();
+                LitePal.delete(User.class,user.getId());
+                refreshUserList();
+                isFirstDelete = true;
+                SPUtils.getInstance().put("is_first_delete",true);
+            }
+        });
     }
 
     private void refreshUserList() {

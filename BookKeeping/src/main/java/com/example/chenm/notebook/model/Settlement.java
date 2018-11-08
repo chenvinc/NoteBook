@@ -16,6 +16,18 @@ public class Settlement{
      * 总结算金额
      */
     public double allAmount;
+    /**
+     * 被删除用户已付金额
+     */
+    public double deleteUserAmount;
+    /**
+     * 被删除用户应付金额
+     */
+    public double deleteUserPayment;
+    /**
+     * 被删除用户结算金额
+     */
+    public double deleteUserSettlement;
 
     public List<SettlementItem> dataShouldPay = new ArrayList<>();
     public List<SettlementItem> dataPayment = new ArrayList<>();

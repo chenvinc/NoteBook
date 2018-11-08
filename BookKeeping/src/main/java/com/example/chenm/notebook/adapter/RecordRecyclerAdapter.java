@@ -26,12 +26,20 @@ public class RecordRecyclerAdapter extends BaseItemDraggableAdapter<RecordsForSh
         helper.setText(R.id.record_time,item.getTime());
         StringBuilder builder = new StringBuilder();
         for (User user : item.getUsers()){
-            builder.append(user.getUserName()).append(" ");
+            if (user == null) {
+                builder.append("已删除").append(" ");
+            } else {
+                builder.append(user.getUserName()).append(" ");
+            }
         }
         helper.setText(R.id.record_with_peoples,builder.toString());
         helper.setText(R.id.record_price_amount,"￥"+item.getPrice());
         helper.setText(R.id.record_things_name,item.getThing());
-        helper.setText(R.id.record_payment_people,item.getBuyer().getUserName());
+        if (item.getBuyer() == null ) {
+            helper.setText(R.id.record_payment_people,"已删除");
+        } else {
+            helper.setText(R.id.record_payment_people,item.getBuyer().getUserName());
+        }
         if ("1".equals(item.getIsCheck())){
             helper.setVisible(R.id.item_record_checked,true);
         } else {

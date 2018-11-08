@@ -122,6 +122,7 @@ public class NewRecordActivity extends Activity {
                                 recordPaymentPeople.setText(user.getUser().getUserName());
                             }
                         }
+                        clearStatus();
                     }
                 });
                 dialogChoosePaymentPeople.show();
@@ -140,6 +141,7 @@ public class NewRecordActivity extends Activity {
                             }
                         }
                         recordWithPeople.setText(withPeopleName);
+                        clearStatus();
                     }
                 });
                 dialogChooseWithPeoples.show();
@@ -148,6 +150,12 @@ public class NewRecordActivity extends Activity {
                 commit();
             default:
                 break;
+        }
+    }
+
+    private void clearStatus() {
+        for (SelectUser selectUser : selectUsers) {
+            selectUser.setCheck(false);
         }
     }
 

@@ -60,6 +60,7 @@ public class MainActivity extends Activity implements OnItemSwipeListener{
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         Utils.init(getApplication());
+        LitePal.deleteDatabase("bookkeeping");
         recordRecyclerAdapter = new RecordRecyclerAdapter(records);
     }
 

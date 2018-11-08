@@ -12,4 +12,6 @@
     <string name="add_success">添加成功</string>
     <string name="relations">关系人</string>
     <string name="add_relation">添加关系人</string>
+    <string name="remind_str">删除关系人可能导致有关的账单记录中信息不显示</string>
+    <string name="remind_sure">确认吗？</string>
 </resources>

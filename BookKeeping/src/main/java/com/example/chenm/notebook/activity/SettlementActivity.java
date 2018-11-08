@@ -5,11 +5,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,12 +26,10 @@ import com.example.chenm.notebook.model.User;
 import com.example.chenm.notebook.utils.DataBaseUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import org.litepal.LitePal;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -63,6 +58,12 @@ public class SettlementActivity extends Activity {
     RecyclerView settlementPeruserShouldPay;
     @BindView(R.id.settlement_all)
     RecyclerView settlementAll;
+    @BindView(R.id.delete_user_paid)
+    TextView deleteUserPaid;
+    @BindView(R.id.delete_user_should_pay)
+    TextView deleteUserShouldPay;
+    @BindView(R.id.delete_user_settlement)
+    TextView deleteUserSettlement;
 
     /**
      * 应付金额
@@ -84,11 +85,11 @@ public class SettlementActivity extends Activity {
     public static int CHECK_FOR_VIEW = 2;
 
     private Gson gson;
+    private final int DELETE_USER = 10086;
 
-
-    public static void launch(Context context,int intentTypeValue) {
+    public static void launch(Context context, int intentTypeValue) {
         Intent intent = new Intent(context, SettlementActivity.class);
-        intent.putExtra(INTENT_TYPE,intentTypeValue);
+        intent.putExtra(INTENT_TYPE, intentTypeValue);
         context.startActivity(intent);
     }
 
@@ -100,7 +101,7 @@ public class SettlementActivity extends Activity {
         init();
     }
 
-    public void init(){
+    public void init() {
         tvTitle.setText("结算");
         relBar.setBackgroundColor(getColor(R.color.white));
         ivBack.setOnClickListener(new View.OnClickListener() {
@@ -111,15 +112,17 @@ public class SettlementActivity extends Activity {
         });
         gson = new GsonBuilder().create();
 
-        int intentType = getIntent().getIntExtra(INTENT_TYPE,1);
-        if (intentType == 1){
+        int intentType = getIntent().getIntExtra(INTENT_TYPE, 1);
+        if (intentType == 1) {
             settlementAllRecord();
         } else {
             checkResultWithSave();
         }
     }
 
-    public void settlementAllRecord(){
+    public void settlementAllRecord() {
+        settlement.deleteUserAmount = 0;
+        settlement.deleteUserPayment = 0;
 
         List<User> users = DataBaseUtils.getInstance().selectAllUser();
         for (User user : users) {
@@ -138,50 +141,73 @@ public class SettlementActivity extends Activity {
         }
 
         List<RecordsForShow> records = DataBaseUtils.getInstance().selectAllUnsettlementRecord();
-        if (records == null || records.size() == 0){
+        if (records == null || records.size() == 0) {
             noRecordsLayout.setVisibility(View.VISIBLE);
             settlementContent.setVisibility(View.GONE);
             return;
         }
         ContentValues values = new ContentValues();
-        values.put("isCheck","1");
-        for (RecordsForShow record : records){
+        values.put("isCheck", "1");
+        for (RecordsForShow record : records) {
             settlement.allAmount += record.getPrice();
-            settlement.dataPayment.get(record.getBuyer().getId() - 1).price += record.getPrice();
-            double average = record.getPrice()/(record.getUsers().size());
-            for (User user : record.getUsers()){
-                settlement.dataShouldPay.get(user.getId() - 1).price+=average;
+            if (record.getBuyer() == null) {
+                settlement.deleteUserAmount += record.getPrice();
+            } else {
+                int pos = returnPosition(settlement.dataPayment, record.getBuyer().getId());
+                if (pos == DELETE_USER) {
+                    settlement.deleteUserAmount += record.getPrice();
+                } else {
+                    settlement.dataPayment.get(pos).price += record.getPrice();
+                }
             }
-            LitePal.update(Record.class,values,record.getId());
+            double average = record.getPrice() / (record.getUsers().size());
+            for (User user : record.getUsers()) {
+                if (user == null) {
+                    settlement.deleteUserPayment += average;
+                } else {
+                    int pos = returnPosition(settlement.dataShouldPay, user.getId());
+                    if (pos == DELETE_USER) {
+                        settlement.deleteUserPayment += average;
+                    } else {
+                        settlement.dataShouldPay.get(pos).price += average;
+                    }
+                }
+            }
+            LitePal.update(Record.class, values, record.getId());
         }
 
-        SPUtils.getInstance().put("settlement_time",records.get(records.size()-1).getTime());
-        SPUtils.getInstance().put("settlement_price"," "+settlement.allAmount);
+        settlement.deleteUserSettlement = settlement.deleteUserAmount - settlement.deleteUserPayment;
 
-        settlement.allAmount = new BigDecimal(settlement.allAmount).setScale(2,BigDecimal.ROUND_HALF_DOWN).doubleValue();
+        SPUtils.getInstance().put("settlement_time", records.get(records.size() - 1).getTime());
+        SPUtils.getInstance().put("settlement_price", " " + settlement.allAmount);
+
+        settlement.allAmount = new BigDecimal(settlement.allAmount).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
+        settlement.deleteUserPayment = new BigDecimal(settlement.deleteUserPayment).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
+        settlement.deleteUserAmount = new BigDecimal(settlement.deleteUserAmount).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
+        settlement.deleteUserSettlement = new BigDecimal(settlement.deleteUserSettlement).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
 
         double price;
-        for (int i=0;i<settlement.dataPayment.size();i++){
+        for (int i = 0; i < settlement.dataPayment.size(); i++) {
             settlement.dataSettlementAll.get(i).price = settlement.dataShouldPay.get(i).price - settlement.dataPayment.get(i).price;
             price = settlement.dataPayment.get(i).price;
             settlement.dataPayment.get(i).price = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
             price = settlement.dataShouldPay.get(i).price;
             settlement.dataShouldPay.get(i).price = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
             price = settlement.dataSettlementAll.get(i).price;
-            settlement.dataSettlementAll.get(i).price = new BigDecimal(price).setScale(2,BigDecimal.ROUND_HALF_DOWN).doubleValue();
+            settlement.dataSettlementAll.get(i).price = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
         }
 
         String settlementStr = gson.toJson(settlement);
-        SPUtils.getInstance().put("settlement_result_all",settlementStr);
+        SPUtils.getInstance().put("settlement_result_all", settlementStr);
 
         setAdapter();
 
     }
 
-    public void checkResultWithSave(){
+    public void checkResultWithSave() {
 
         String settlementStr = SPUtils.getInstance().getString("settlement_result_all");
-        if (settlementStr == ""){
+        if (settlementStr == "") {
             noRecordsLayout.setVisibility(View.VISIBLE);
             settlementContent.setVisibility(View.GONE);
             return;
@@ -191,43 +217,61 @@ public class SettlementActivity extends Activity {
         setAdapter();
     }
 
-    public void setAdapter(){
-        settlementAmountAll.setText("￥ "+settlement.allAmount);
+    private int returnPosition(List<SettlementItem> itemList, int id) {
+        for (int i = 0; i < itemList.size(); i++) {
+            if (itemList.get(i).user.getId() == id) {
+                return i;
+            }
+        }
+        return DELETE_USER;
+    }
+
+    public void setAdapter() {
+        settlementAmountAll.setText("￥ " + settlement.allAmount);
         mPaymentAdapter = new MyAdapter(settlement.dataPayment);
         mShouldPayAdapter = new MyAdapter(settlement.dataShouldPay);
         mSettlementAllAdapter = new MyAdapter(settlement.dataSettlementAll);
         settlementPeruserPayment.setAdapter(mPaymentAdapter);
         settlementPeruserShouldPay.setAdapter(mShouldPayAdapter);
         settlementAll.setAdapter(mSettlementAllAdapter);
+        if (settlement.deleteUserPayment != 0 && settlement.deleteUserAmount != 0) {
+            String deleteUserStr = "已删除关系人： ";
+            deleteUserShouldPay.setVisibility(View.VISIBLE);
+            deleteUserPaid.setVisibility(View.VISIBLE);
+            deleteUserSettlement.setVisibility(View.VISIBLE);
+            deleteUserShouldPay.setText(deleteUserStr + String.valueOf(settlement.deleteUserPayment));
+            deleteUserPaid.setText(deleteUserStr + String.valueOf(settlement.deleteUserAmount));
+            deleteUserSettlement.setText(deleteUserStr + String.valueOf(settlement.deleteUserSettlement));
+        }
     }
 
-    class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
+    class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         List<SettlementItem> dataList;
 
-        public MyAdapter(List<SettlementItem> data){
+        public MyAdapter(List<SettlementItem> data) {
             this.dataList = data;
         }
 
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(SettlementActivity.this).inflate(R.layout.item_settlement,parent,false);
+            View view = LayoutInflater.from(SettlementActivity.this).inflate(R.layout.item_settlement, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             holder.settlementUsername.setText(dataList.get(position).user.getUserName());
-            holder.settlementMoney.setText("￥ "+dataList.get(position).price);
+            holder.settlementMoney.setText("￥ " + dataList.get(position).price);
         }
 
         @Override
         public int getItemCount() {
-            return dataList == null ? 0:dataList.size();
+            return dataList == null ? 0 : dataList.size();
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder{
+        public class ViewHolder extends RecyclerView.ViewHolder {
             @BindView(R.id.settlement_username)
             TextView settlementUsername;
             @BindView(R.id.settlement_money)
