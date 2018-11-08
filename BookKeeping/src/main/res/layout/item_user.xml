@@ -8,7 +8,7 @@
     android:paddingVertical="@dimen/dp_10">
 
             <TextView
-                android:textColor="@color/text_blue"
+                android:textColor="@color/order_name_blue"
                 android:id="@+id/user_id"
                 android:textSize="18sp"
                 android:layout_weight="1"
@@ -16,7 +16,7 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:textColor="@color/text_blue"
+                android:textColor="@color/order_name_blue"
                 android:id="@+id/user_name"
                 android:gravity="end"
                 android:textSize="18sp"

@@ -72,7 +72,7 @@ public class DialogWithEditText extends Dialog {
                 dismiss();
                 break;
             case R.id.tv_center_confirm:
-                confirmButtonOnclickListener.onConfirmButtonClick(etUserNameFill.getText().toString());
+                confirmButtonOnclickListener.onConfirmButtonClick(etUserNameFill.getText().toString().trim());
                 break;
             default:
                 break;

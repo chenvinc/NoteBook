@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -161,12 +162,20 @@ public class NewRecordActivity extends Activity {
 
     private void commit() {
         RecordsForShow record = new RecordsForShow();
-        if (recordDate.getText() == null) {
+
+        String recordDataStr = recordDate.getText().toString().trim();
+        if (TextUtils.isEmpty(recordDataStr)) {
             Toast.makeText(this, "未输入日期", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (recordThings.getText() == null) {
+        String recordThingsStr = recordThings.getText().toString().trim();
+        if (TextUtils.isEmpty(recordThingsStr)) {
             Toast.makeText(this, "未输入明细", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String recordPaymentStr = recordPaymentAmount.getText().toString().trim();
+        if (TextUtils.isEmpty(recordPaymentStr)) {
+            Toast.makeText(this, "未输入金额", Toast.LENGTH_SHORT).show();
             return;
         }
         if (ObjectUtils.isEmpty(paymentPeople)) {
@@ -177,10 +186,6 @@ public class NewRecordActivity extends Activity {
             Toast.makeText(this, "未选择关系人", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (recordPaymentAmount.getText() == null) {
-            Toast.makeText(this, "未输入金额", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         List<User> withPeopleList = new ArrayList<>();
         for (SelectUser selectUser : withPeoples) {
@@ -188,9 +193,9 @@ public class NewRecordActivity extends Activity {
         }
         record.setUsers(withPeopleList);
         record.setBuyer(paymentPeople.getUser());
-        record.setTime(recordDate.getText().toString());
-        record.setThing(recordThings.getText().toString());
-        record.setPrice(Double.parseDouble(recordPaymentAmount.getText().toString()));
+        record.setTime(recordDataStr);
+        record.setThing(recordThingsStr);
+        record.setPrice(Double.parseDouble(recordPaymentStr));
         record.setIsCheck("0");
         if (DataBaseUtils.getInstance().saveRecord(record)) {
             finish();

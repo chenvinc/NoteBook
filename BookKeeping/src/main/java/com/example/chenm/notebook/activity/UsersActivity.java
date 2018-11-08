@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -35,6 +36,7 @@ import com.yanzhenjie.recyclerview.swipe.widget.DefaultItemDecoration;
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 import butterknife.BindView;
@@ -118,13 +120,7 @@ public class UsersActivity extends Activity{
     @Override
     protected void onResume() {
         super.onResume();
-        users.clear();
-        users.addAll(DataBaseUtils.getInstance().selectAllUser());
-        if (ObjectUtils.isEmpty(users)){
-            addRelationLayout.setVisibility(View.VISIBLE);
-        }else {
-            adapter.setNewData(users);
-        }
+        refreshUserList();
     }
 
     @Override
@@ -172,9 +168,13 @@ public class UsersActivity extends Activity{
         users.clear();
         users.addAll(DataBaseUtils.getInstance().selectAllUser());
         if (users.size() == 0) {
-            addRelationLayout.setVisibility(View.VISIBLE);
+            if (addRelationLayout.getVisibility() == View.GONE) {
+                addRelationLayout.setVisibility(View.VISIBLE);
+            }
         } else {
-            addRelationLayout.setVisibility(View.GONE);
+            if (addRelationLayout.getVisibility() == View.VISIBLE) {
+                addRelationLayout.setVisibility(View.GONE);
+            }
         }
         adapter.setNewData(users);
     }
@@ -184,6 +184,10 @@ public class UsersActivity extends Activity{
         dialogWithEditText.setConfirmButtonOnclickListener(new DialogWithEditText.OnConfirmButtonOnclickListener() {
             @Override
             public void onConfirmButtonClick(String username) {
+                if (TextUtils.isEmpty(username)) {
+                    Toast.makeText(UsersActivity.this,"请填写关系人名称",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 User user = new User();
                 user.setUserName(username);
                 if (user.save()){
