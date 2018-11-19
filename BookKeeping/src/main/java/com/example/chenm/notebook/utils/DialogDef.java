@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ConvertUtils;
 import com.example.chenm.notebook.R;
 import com.example.chenm.notebook.adapter.SelectUserAdapter;
 import com.example.chenm.notebook.model.SelectUser;
@@ -99,6 +100,7 @@ public class DialogDef extends Dialog {
         adapter = new SelectUserAdapter(context,userList,canChooseAll);
         init();
         initEvent();
+        setDialogHeight();
     }
 
     private void init(){
@@ -148,6 +150,16 @@ public class DialogDef extends Dialog {
                 dismiss();
             }
         });
+    }
+
+    private void setDialogHeight() {
+        if (userList.size() < 16) {
+            return;
+        } else {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) selectUserList.getLayoutParams();
+            params.height = ConvertUtils.dp2px(50) * 8;
+            selectUserList.setLayoutParams(params);
+        }
     }
 
     private void chooseEvent() {

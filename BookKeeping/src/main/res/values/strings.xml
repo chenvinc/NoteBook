@@ -5,6 +5,9 @@
     <string name="sure">确定</string>
     <string name="insert_new_record_2">新增</string>
     <string name="settlement">结算</string>
+    <string name="settlement_in">结算（周期中）：</string>
+    <string name="should_pay_in">应付（周期中）：</string>
+    <string name="payment_in">已付（周期中）：</string>
     <string name="record_data">账单记录:</string>
     <string name="have_no_record_yet">暂无账单记录</string>
     <string name="have_no_unsettlement_record_yet">暂无未结算账单记录</string>

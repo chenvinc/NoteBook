@@ -40,7 +40,7 @@ import butterknife.OnClick;
 /**
  * @author chenm
  */
-public class MainActivity extends Activity implements OnItemSwipeListener{
+public class MainActivity extends Activity implements OnItemSwipeListener,BaseQuickAdapter.RequestLoadMoreListener {
 
     @BindView(R.id.tv_available_amount)
     TextView tvAvailableAmount;
@@ -53,6 +53,7 @@ public class MainActivity extends Activity implements OnItemSwipeListener{
     private List<RecordsForShow> records = new ArrayList<>();
 
     private RecordRecyclerAdapter recordRecyclerAdapter;
+    private int singlePageItemCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +83,7 @@ public class MainActivity extends Activity implements OnItemSwipeListener{
             records = new ArrayList<>();
         }
         records.clear();
-        records.addAll(DataBaseUtils.getInstance().select10Records());
+        records.addAll(DataBaseUtils.getInstance().select10Records(singlePageItemCount));
         if (records.size() == 0) {
             lineNoRecords.setVisibility(View.VISIBLE);
         } else {
@@ -97,12 +98,9 @@ public class MainActivity extends Activity implements OnItemSwipeListener{
         helper.attachToRecyclerView(recordList);
         adapter.enableSwipeItem();
         adapter.setOnItemSwipeListener(this);
+        adapter.setOnLoadMoreListener(this,recordList);
         recordList.setAdapter(adapter);
     }
-
-
-
-
     @OnClick({R.id.users, R.id.btn_settlement, R.id.btn_new_record, R.id.tv_available_amount})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -138,5 +136,21 @@ public class MainActivity extends Activity implements OnItemSwipeListener{
 
     @Override
     public void onItemSwipeMoving(Canvas canvas, RecyclerView.ViewHolder viewHolder, float dX, float dY, boolean isCurrentlyActive) {
+    }
+
+    @Override
+    public void onLoadMoreRequested() {
+        singlePageItemCount+=10;
+        List<RecordsForShow> recordsForShowList = DataBaseUtils.getInstance().select10Records(singlePageItemCount);
+        if (recordsForShowList != null) {
+            recordRecyclerAdapter.addData(recordsForShowList);
+            if (recordsForShowList.size() < singlePageItemCount) {
+                recordRecyclerAdapter.loadMoreEnd();
+            } else {
+                recordRecyclerAdapter.loadMoreComplete();
+            }
+        } else {
+            recordRecyclerAdapter.loadMoreFail();
+        }
     }
 }

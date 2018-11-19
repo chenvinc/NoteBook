@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ConvertUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.example.chenm.notebook.R;
 import com.example.chenm.notebook.model.Record;
@@ -81,6 +83,11 @@ public class SettlementActivity extends Activity {
     private Settlement settlement = new Settlement();
 
     public static String INTENT_TYPE = "intent_type";
+    private static String IS_CHECK = "isCheck";
+    private static String CHECKED = "1";
+    public static String SETTLEMENT_TIME = "settlement_time";
+    public static String SETTLEMENT_DATE = "settlement_price";
+    public static String SETTLEMENT_RESULT_ALL = "settlement_result_all";
     public static int SETTLEMENT = 1;
     public static int CHECK_FOR_VIEW = 2;
 
@@ -124,30 +131,20 @@ public class SettlementActivity extends Activity {
         settlement.deleteUserAmount = 0;
         settlement.deleteUserPayment = 0;
 
-        List<User> users = DataBaseUtils.getInstance().selectAllUser();
-        for (User user : users) {
-            SettlementItem data1 = new SettlementItem();
-            data1.price = 0;
-            data1.user = user;
-            settlement.dataShouldPay.add(data1);
-            SettlementItem data2 = new SettlementItem();
-            data2.price = 0;
-            data2.user = user;
-            settlement.dataPayment.add(data2);
-            SettlementItem data3 = new SettlementItem();
-            data3.price = 0;
-            data3.user = user;
-            settlement.dataSettlementAll.add(data3);
-        }
+        //初始化三个list数据
+        initListData();
 
+        //判断是否有数据
         List<RecordsForShow> records = DataBaseUtils.getInstance().selectAllUnsettlementRecord();
         if (records == null || records.size() == 0) {
             noRecordsLayout.setVisibility(View.VISIBLE);
             settlementContent.setVisibility(View.GONE);
             return;
         }
+        //把取出来的数据check状态置成已结算
         ContentValues values = new ContentValues();
-        values.put("isCheck", "1");
+        values.put(IS_CHECK, CHECKED);
+        //结算程序
         for (RecordsForShow record : records) {
             settlement.allAmount += record.getPrice();
             if (record.getBuyer() == null) {
@@ -178,9 +175,39 @@ public class SettlementActivity extends Activity {
 
         settlement.deleteUserSettlement = settlement.deleteUserAmount - settlement.deleteUserPayment;
 
-        SPUtils.getInstance().put("settlement_time", records.get(records.size() - 1).getTime());
-        SPUtils.getInstance().put("settlement_price", " " + settlement.allAmount);
+        //修饰数据
+        setDataDoubleLay();
 
+        //缓存本次结算结果
+        SPUtils.getInstance().put(SETTLEMENT_TIME, records.get(records.size() - 1).getTime());
+        SPUtils.getInstance().put(SETTLEMENT_DATE, String.valueOf(settlement.allAmount));
+
+        String settlementStr = gson.toJson(settlement);
+        SPUtils.getInstance().put(SETTLEMENT_RESULT_ALL, settlementStr);
+
+        setAdapter();
+
+    }
+
+    private void initListData() {
+        List<User> users = DataBaseUtils.getInstance().selectAllUser();
+        for (User user : users) {
+            SettlementItem data1 = new SettlementItem();
+            data1.price = 0;
+            data1.user = user;
+            settlement.dataShouldPay.add(data1);
+            SettlementItem data2 = new SettlementItem();
+            data2.price = 0;
+            data2.user = user;
+            settlement.dataPayment.add(data2);
+            SettlementItem data3 = new SettlementItem();
+            data3.price = 0;
+            data3.user = user;
+            settlement.dataSettlementAll.add(data3);
+        }
+    }
+
+    private void setDataDoubleLay(){
         settlement.allAmount = new BigDecimal(settlement.allAmount).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
         settlement.deleteUserPayment = new BigDecimal(settlement.deleteUserPayment).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
         settlement.deleteUserAmount = new BigDecimal(settlement.deleteUserAmount).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
@@ -196,18 +223,11 @@ public class SettlementActivity extends Activity {
             price = settlement.dataSettlementAll.get(i).price;
             settlement.dataSettlementAll.get(i).price = new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
         }
-
-        String settlementStr = gson.toJson(settlement);
-        SPUtils.getInstance().put("settlement_result_all", settlementStr);
-
-        setAdapter();
-
     }
-
     public void checkResultWithSave() {
 
-        String settlementStr = SPUtils.getInstance().getString("settlement_result_all");
-        if (settlementStr == "") {
+        String settlementStr = SPUtils.getInstance().getString(SETTLEMENT_RESULT_ALL);
+        if (TextUtils.isEmpty(settlementStr)) {
             noRecordsLayout.setVisibility(View.VISIBLE);
             settlementContent.setVisibility(View.GONE);
             return;
@@ -243,6 +263,15 @@ public class SettlementActivity extends Activity {
             deleteUserPaid.setText(deleteUserStr + String.valueOf(settlement.deleteUserAmount));
             deleteUserSettlement.setText(deleteUserStr + String.valueOf(settlement.deleteUserSettlement));
         }
+        setListHeight(settlementPeruserPayment, mPaymentAdapter);
+        setListHeight(settlementPeruserShouldPay, mShouldPayAdapter);
+        setListHeight(settlementAll, mSettlementAllAdapter);
+    }
+
+    public void setListHeight(RecyclerView recyclerView,MyAdapter adapter) {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
+        params.height = ConvertUtils.dp2px(50) * adapter.getItemCount();
+        recyclerView.setLayoutParams(params);
     }
 
     class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
@@ -256,7 +285,7 @@ public class SettlementActivity extends Activity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(SettlementActivity.this).inflate(R.layout.item_settlement, parent, false);
+            View view = LayoutInflater.from(SettlementActivity.this).inflate(R.layout.item_settlement, null, false);
             return new ViewHolder(view);
         }
 

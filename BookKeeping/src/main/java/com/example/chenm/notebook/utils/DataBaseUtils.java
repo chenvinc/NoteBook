@@ -36,9 +36,9 @@ public class DataBaseUtils {
         return LitePal.findAll(User.class);
     }
 
-    public List<RecordsForShow> select10Records(){
+    public List<RecordsForShow> select10Records(int pageNum){
         List<RecordsForShow> records = new ArrayList<>();
-        List<Record> recordList = LitePal.order("id desc").find(Record.class,true);
+        List<Record> recordList = LitePal.order("id desc").limit(10).offset(pageNum).find(Record.class,true);
         for (Record record :recordList){
             RecordsForShow recordsForShow =  new RecordsForShow();
             recordsForShow.setId(record.getId());

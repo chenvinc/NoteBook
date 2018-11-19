@@ -36,7 +36,7 @@
         android:id="@+id/settlement_content"
         android:scrollbars="none"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
         <LinearLayout
             android:layout_marginVertical="15dp"
             android:orientation="vertical"
@@ -88,7 +88,7 @@
                     android:layout_height="wrap_content">
                     <TextView
                         android:textColor="@color/blue1"
-                        android:text="已付（周期中）："
+                        android:text="@string/payment_in"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
@@ -125,7 +125,7 @@
                     android:layout_height="wrap_content">
                     <TextView
                         android:textColor="@color/blue1"
-                        android:text="应付（周期中）："
+                        android:text="@string/should_pay_in"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
@@ -162,7 +162,7 @@
                     android:layout_height="wrap_content">
                     <TextView
                         android:textColor="@color/blue1"
-                        android:text="结算（周期中）："
+                        android:text="@string/settlement_in"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
