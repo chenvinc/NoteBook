@@ -6,8 +6,23 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <include
-        layout="@layout/layout_title_bar"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include
+            layout="@layout/layout_title_bar"/>
+
+        <Button
+            android:id="@+id/share_to_wechat"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dp"
+            android:text="分享至微信"
+            android:textColor="@color/white"
+            android:background="@drawable/selector_btn_red_fillet"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp" />
+    </RelativeLayout>
 
     <LinearLayout
         android:visibility="gone"

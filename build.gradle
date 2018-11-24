@@ -4,10 +4,10 @@ buildscript {
     
     repositories {
         maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        jcenter()
+        google()
         maven { url "https://jitpack.io" }
         mavenCentral()
-        google()
-        jcenter()
         maven {
             url 'https://maven.google.com/'
             name 'Google'
@@ -23,10 +23,10 @@ buildscript {
 allprojects {
     repositories {
         maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        jcenter()
+        google()
         maven { url "https://jitpack.io" }
         mavenCentral()
-        google()
-        jcenter()
         maven {
             url 'https://maven.google.com/'
             name 'Google'

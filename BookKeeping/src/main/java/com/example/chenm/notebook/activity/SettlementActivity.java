@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -25,9 +26,15 @@ import com.example.chenm.notebook.model.RecordsForShow;
 import com.example.chenm.notebook.model.Settlement;
 import com.example.chenm.notebook.model.SettlementItem;
 import com.example.chenm.notebook.model.User;
+import com.example.chenm.notebook.utils.CommonUtils;
 import com.example.chenm.notebook.utils.DataBaseUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
+import com.tencent.mm.opensdk.modelmsg.WXImageObject;
+import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 import org.litepal.LitePal;
 
@@ -36,6 +43,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * @author chenm
@@ -90,6 +98,8 @@ public class SettlementActivity extends Activity {
     public static String SETTLEMENT_RESULT_ALL = "settlement_result_all";
     public static int SETTLEMENT = 1;
     public static int CHECK_FOR_VIEW = 2;
+    private static final String APP_ID = "wxd242d60be526023a";
+    private static IWXAPI iwxapi;
 
     private Gson gson;
     private final int DELETE_USER = 10086;
@@ -99,6 +109,13 @@ public class SettlementActivity extends Activity {
         intent.putExtra(INTENT_TYPE, intentTypeValue);
         context.startActivity(intent);
     }
+
+    @OnClick(R.id.share_to_wechat)
+    public void screenShootAndShareToWechat(){
+        registerApp();
+        shareToWeChat(CommonUtils.shootScrollView(settlementContent));
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -272,6 +289,28 @@ public class SettlementActivity extends Activity {
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
         params.height = ConvertUtils.dp2px(50) * adapter.getItemCount();
         recyclerView.setLayoutParams(params);
+    }
+
+    public void registerApp() {
+        iwxapi = WXAPIFactory.createWXAPI(this,APP_ID);
+        iwxapi.registerApp(APP_ID);
+    }
+
+    public void shareToWeChat(Bitmap bitmap) {
+        WXImageObject imgObj = new WXImageObject(bitmap);
+        WXMediaMessage msg = new WXMediaMessage();
+        msg.mediaObject = imgObj;
+
+        Bitmap thumbBmp = Bitmap.createScaledBitmap(bitmap,150,150,true);
+        bitmap.recycle();
+        msg.thumbData = ConvertUtils.bitmap2Bytes(thumbBmp,Bitmap.CompressFormat.PNG);
+
+        SendMessageToWX.Req req = new SendMessageToWX.Req();
+        req.transaction = "bookKeeping" + CommonUtils.getTimeSign();
+        req.message = msg;
+        req.scene = SendMessageToWX.Req.WXSceneSession;
+
+        iwxapi.sendReq(req);
     }
 
     class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
