@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blankj.utilcode.util.ConvertUtils;
 import com.blankj.utilcode.util.SPUtils;
@@ -101,6 +102,7 @@ public class SettlementActivity extends Activity {
     private static final String APP_ID = "wxd242d60be526023a";
     private static IWXAPI iwxapi;
 
+    private boolean isHaveDataToShare = false;
     private Gson gson;
     private final int DELETE_USER = 10086;
 
@@ -112,8 +114,12 @@ public class SettlementActivity extends Activity {
 
     @OnClick(R.id.share_to_wechat)
     public void screenShootAndShareToWechat(){
-        registerApp();
-        shareToWeChat(CommonUtils.shootScrollView(settlementContent));
+        if (isHaveDataToShare) {
+            registerApp();
+            shareToWeChat(CommonUtils.shootScrollView(settlementContent));
+        } else {
+            Toast.makeText(this, "无可分享内容", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -156,8 +162,10 @@ public class SettlementActivity extends Activity {
         if (records == null || records.size() == 0) {
             noRecordsLayout.setVisibility(View.VISIBLE);
             settlementContent.setVisibility(View.GONE);
+            isHaveDataToShare = false;
             return;
         }
+        isHaveDataToShare = true;
         //把取出来的数据check状态置成已结算
         ContentValues values = new ContentValues();
         values.put(IS_CHECK, CHECKED);
@@ -245,13 +253,15 @@ public class SettlementActivity extends Activity {
 
         String settlementStr = SPUtils.getInstance().getString(SETTLEMENT_RESULT_ALL);
         if (TextUtils.isEmpty(settlementStr)) {
+            isHaveDataToShare = false;
             noRecordsLayout.setVisibility(View.VISIBLE);
             settlementContent.setVisibility(View.GONE);
-            return;
+        } else {
+            settlement = gson.fromJson(settlementStr, Settlement.class);
+            isHaveDataToShare = true;
+            setAdapter();
         }
-        settlement = gson.fromJson(settlementStr, Settlement.class);
 
-        setAdapter();
     }
 
     private int returnPosition(List<SettlementItem> itemList, int id) {

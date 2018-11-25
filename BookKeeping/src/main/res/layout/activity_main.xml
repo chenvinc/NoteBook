@@ -32,12 +32,22 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/last_settlement_tipheader"
                     android:layout_marginLeft="10dp"
                     android:layout_centerVertical="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:text="上次结算：" />
+                <TextView
+                    android:id="@+id/last_settlement_tipcontent"
+                    android:layout_toRightOf="@+id/last_settlement_tipheader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/last_settlement_tipheader"
+                    android:textSize="8sp"
+                    android:textColor="@color/red1"
+                    android:text="(点击数字可查看上次结算结果)" />
 
                 <ImageView
                     android:id="@+id/users"
@@ -163,6 +173,5 @@
         android:id="@+id/record_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        />
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 </LinearLayout>

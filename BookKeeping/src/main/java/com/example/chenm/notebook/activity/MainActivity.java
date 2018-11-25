@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -50,6 +51,9 @@ public class MainActivity extends Activity implements OnItemSwipeListener,BaseQu
     LinearLayout lineNoRecords;
     @BindView(R.id.record_list)
     RecyclerView recordList;
+    @BindView(R.id.last_settlement_tipcontent)
+    TextView lastSettlementTipContent;
+
     private List<RecordsForShow> records = new ArrayList<>();
 
     private RecordRecyclerAdapter recordRecyclerAdapter;
@@ -61,7 +65,6 @@ public class MainActivity extends Activity implements OnItemSwipeListener,BaseQu
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         Utils.init(getApplication());
-        LitePal.deleteDatabase("bookkeeping");
         recordRecyclerAdapter = new RecordRecyclerAdapter(records);
     }
 
@@ -74,8 +77,15 @@ public class MainActivity extends Activity implements OnItemSwipeListener,BaseQu
     }
 
     private void initView() {
-        tvAvailableAmount.setText(SPUtils.getInstance().getString("settlement_price"));
-        settlementDate.setText(SPUtils.getInstance().getString("settlement_time"));
+        String lastSettlementPrice = SPUtils.getInstance().getString("settlement_price");
+        String lastSettlementTime = SPUtils.getInstance().getString("settlement_time");
+        if (!TextUtils.isEmpty(lastSettlementPrice) && !TextUtils.isEmpty(lastSettlementTime)) {
+            tvAvailableAmount.setText(lastSettlementPrice);
+            settlementDate.setText(lastSettlementTime);
+            lastSettlementTipContent.setVisibility(View.VISIBLE);
+        } else {
+            lastSettlementTipContent.setVisibility(View.GONE);
+        }
     }
 
     private void initData() {
@@ -83,13 +93,13 @@ public class MainActivity extends Activity implements OnItemSwipeListener,BaseQu
             records = new ArrayList<>();
         }
         records.clear();
-        records.addAll(DataBaseUtils.getInstance().select10Records(singlePageItemCount));
+        records.addAll(DataBaseUtils.getInstance().select10Records(0));
         if (records.size() == 0) {
             lineNoRecords.setVisibility(View.VISIBLE);
         } else {
             lineNoRecords.setVisibility(View.GONE);
+            recordRecyclerAdapter.setNewData(records);
         }
-        recordRecyclerAdapter.setNewData(records);
     }
 
     private void setAdapter(RecordRecyclerAdapter adapter) {
@@ -101,6 +111,7 @@ public class MainActivity extends Activity implements OnItemSwipeListener,BaseQu
         adapter.setOnLoadMoreListener(this,recordList);
         recordList.setAdapter(adapter);
     }
+
     @OnClick({R.id.users, R.id.btn_settlement, R.id.btn_new_record, R.id.tv_available_amount})
     public void onViewClicked(View view) {
         switch (view.getId()) {
