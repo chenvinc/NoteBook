@@ -1,20 +1,19 @@
 package com.example.chenm.notebook.activity;
 
-import android.app.Activity;
+import android.Manifest;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bigkoo.pickerview.builder.TimePickerBuilder;
-import com.bigkoo.pickerview.listener.CustomListener;
-import com.bigkoo.pickerview.listener.OnTimeSelectListener;
-import com.bigkoo.pickerview.view.TimePickerView;
+import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.Utils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -22,26 +21,23 @@ import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
 import com.chad.library.adapter.base.listener.OnItemSwipeListener;
 import com.example.chenm.notebook.R;
 import com.example.chenm.notebook.adapter.RecordRecyclerAdapter;
-import com.example.chenm.notebook.model.Record;
 import com.example.chenm.notebook.model.RecordsForShow;
-import com.example.chenm.notebook.utils.CommonUtils;
 import com.example.chenm.notebook.utils.DataBaseUtils;
-
-import org.litepal.LitePal;
+import com.tbruyelle.rxpermissions2.Permission;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 
 /**
  * @author chenm
  */
-public class MainActivity extends Activity implements OnItemSwipeListener,BaseQuickAdapter.RequestLoadMoreListener {
+public class MainActivity extends FragmentActivity implements OnItemSwipeListener,BaseQuickAdapter.RequestLoadMoreListener {
 
     @BindView(R.id.tv_available_amount)
     TextView tvAvailableAmount;
@@ -66,6 +62,14 @@ public class MainActivity extends Activity implements OnItemSwipeListener,BaseQu
         ButterKnife.bind(this);
         Utils.init(getApplication());
         recordRecyclerAdapter = new RecordRecyclerAdapter(records);
+        new RxPermissions(this).requestEach(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE).subscribe(new Consumer<Permission>() {
+            @Override
+            public void accept(Permission permission) throws Exception {
+                if (!permission.granted){
+                    finish();
+                }
+            }
+        });
     }
 
     @Override
@@ -74,6 +78,14 @@ public class MainActivity extends Activity implements OnItemSwipeListener,BaseQu
         initView();
         initData();
         setAdapter(recordRecyclerAdapter);
+        cleanOldFileDir();
+    }
+
+    private void cleanOldFileDir(){
+        String filePath = Environment.getExternalStorageDirectory() + "/notebook";
+        if (FileUtils.isDir(filePath)){
+            FileUtils.deleteDir(filePath);
+        }
     }
 
     private void initView() {

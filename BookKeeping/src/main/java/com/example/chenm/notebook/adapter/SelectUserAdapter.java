@@ -86,10 +86,12 @@ public class SelectUserAdapter extends RecyclerView.Adapter<SelectUserAdapter.Se
             }
         }
 
-        public void onClickAction() {
+        private void onClickAction() {
             if (!canChooseAll){
-                for (int i =0;i<mSelectUsers.size();i++){
-                    mSelectUsers.get(i).setCheck(false);
+                for (SelectUser user : mSelectUsers){
+                    if (user.getCheck()) {
+                        user.setCheck(false);
+                    }
                 }
             }
             notifyDataSetChanged();

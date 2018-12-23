@@ -8,5 +8,5 @@
         <mapping class="com.example.chenm.notebook.model.User"/>
         <mapping class="com.example.chenm.notebook.model.WithPeople"/>
     </list>
-    <storage value="notebook/database"/>
+    <storage value="internal"/>
 </litepal>

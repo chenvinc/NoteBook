@@ -11,6 +11,7 @@
         android:padding="20dp"
         android:orientation="vertical">
         <TextView
+            android:id="@+id/remind_str1"
             android:text="@string/remind_str"
             android:textSize="@dimen/sp_16"
             android:textColor="@color/text_blue2"
@@ -18,6 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
+            android:id="@+id/remind_str2"
             android:layout_gravity="center"
             android:gravity="center"
             android:textColor="@color/text_blue2"

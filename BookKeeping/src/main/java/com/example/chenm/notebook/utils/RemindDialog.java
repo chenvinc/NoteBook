@@ -3,6 +3,7 @@ package com.example.chenm.notebook.utils;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -21,6 +22,9 @@ public class RemindDialog extends Dialog {
 
     private TextView cancelButton;
     private TextView confirmButton;
+    private TextView remindStr1;
+    private TextView remindStr2;
+    private String remindStr;
 
     /**
      * 取消按钮被点击了的监听器
@@ -47,6 +51,11 @@ public class RemindDialog extends Dialog {
 
     public RemindDialog(Context context) {
         super(context, R.style.AlertDialog);
+    }
+
+    public RemindDialog(Context context, String remindStr) {
+        super(context, R.style.AlertDialog);
+        this.remindStr = remindStr;
     }
 
     /**
@@ -77,6 +86,12 @@ public class RemindDialog extends Dialog {
     private void init(){
         cancelButton = findViewById(R.id.tv_center_cancle);
         confirmButton = findViewById(R.id.tv_center_sure);
+        remindStr1 = findViewById(R.id.remind_str1);
+        remindStr2 = findViewById(R.id.remind_str2);
+        if (!TextUtils.isEmpty(remindStr)) {
+            remindStr1.setText(remindStr);
+            remindStr2.setVisibility(View.GONE);
+        }
     }
 
     private void initEvent() {

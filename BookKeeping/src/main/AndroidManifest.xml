@@ -34,14 +34,6 @@
             android:name=".activity.SettlementActivity"
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity android:name=".activity.UsersActivity"></activity>
-
-        <activity
-            android:name=".wxapi.WXEntryActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-            android:exported="true"
-            android:taskAffinity="net.sourceForge.simcpux"
-            android:launchMode="singleTask"/>
     </application>
 
 </manifest>

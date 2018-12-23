@@ -24,7 +24,7 @@ import java.util.List;
 public class DialogDef extends Dialog {
 
     private Context context;
-    private static final int resId = R.layout.dialog_userlist;
+    private static final int RES_ID = R.layout.dialog_userlist;
 
     private RecyclerView selectUserList;
     private CheckBox chooseAll;
@@ -95,7 +95,7 @@ public class DialogDef extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(resId);
+        setContentView(RES_ID);
         setCanceledOnTouchOutside(false);
         adapter = new SelectUserAdapter(context,userList,canChooseAll);
         init();
